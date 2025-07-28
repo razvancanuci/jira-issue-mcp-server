@@ -2,8 +2,9 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {api} from "../infrastructure/api.js";
 import {ADFDocumentSchema} from "../models/index.js";
+import {StatusCodes} from "../constants/statusCodes.js";
 
-export function createTaskTool(server: McpServer) {
+export function createIssueTool(server: McpServer) {
     server.tool(
         'createIssue',
         'Creates an issue to the users',
@@ -31,7 +32,7 @@ export function createTaskTool(server: McpServer) {
                 }
             });
 
-            if (response.status !== 201) {
+            if (response.status !== StatusCodes.CREATED) {
                 console.error({status: response.statusText, data: response.data});
                 return {
                     isError: true,

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
+import {StatusCodes} from "../constants/statusCodes.js";
 
 function getAuthHeader() {
     const token = process.env.JIRA_API_TKN;
@@ -22,7 +24,16 @@ const api = axios.create({
         'Content-Type': 'application/json',
         'Authorization': `${getAuthHeader()}`,
     },
-    validateStatus: () => true
+    validateStatus: (status) => status < StatusCodes.INTERNAL_SERVER_ERROR
+});
+
+axiosRetry(api, {
+    retries: 3,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) => {
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+            (error.response != null && error.response?.status >= StatusCodes.INTERNAL_SERVER_ERROR);
+    }
 });
 
 export {api};
