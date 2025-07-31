@@ -1,0 +1,33 @@
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "zod";
+
+
+export function bugReportPrompt(server:McpServer) {
+    server.registerPrompt(
+        "echo",
+        {
+            title: `JIRA Bug Report Prompt`,
+            description: 'In case of a BUG Issue, please provide the expected result, actual result and steps to reproduce the issue',
+            argsSchema: {expectedResult: z.string(), actualResult: z.string().optional(), stepsToReproduce: z.string()},
+        },
+        ({ expectedResult, actualResult }) => {
+            let prompt = `In case of a bug issue, please provide the expected and actual results if it is present.\n**Expected Result**: ${expectedResult}`
+
+            if (actualResult) {
+                prompt += `\n**Actual Result**: ${actualResult}`;
+            }
+
+            prompt += `\nThe prompt should also include the steps to reproduce \n**Steps to Reproduce**: Please provide the steps to reproduce the issue.`;
+
+            return {
+                    messages: [{
+                    role: "user",
+                    content: {
+                        type: "text",
+                        text: prompt
+                    }
+                }]
+            }
+        }
+    )
+}
