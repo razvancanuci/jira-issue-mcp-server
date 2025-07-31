@@ -11,13 +11,13 @@ export function bugReportPrompt(server:McpServer) {
             argsSchema: {expectedResult: z.string(), actualResult: z.string().optional(), stepsToReproduce: z.string()},
         },
         ({ expectedResult, actualResult }) => {
-            let prompt = `In case of a bug issue, please provide the expected and actual results if it is present.\n**Expected Result**: ${expectedResult}`
+            let prompt = `In case of a bug issue, please provide the expected and actual results which are optional. Those should be provided from the user's input.\n**Expected Result**: ${expectedResult}`
 
             if (actualResult) {
                 prompt += `\n**Actual Result**: ${actualResult}`;
             }
 
-            prompt += `\nThe prompt should also include the steps to reproduce \n**Steps to Reproduce**: Please provide the steps to reproduce the issue.`;
+            prompt += `\nThe prompt should also include the steps to reproduce, which should also be in the user's input \n**Steps to Reproduce**: Please provide the steps to reproduce the issue.`;
 
             return {
                     messages: [{
