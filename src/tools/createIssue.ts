@@ -49,7 +49,7 @@ export function createIssueTool(server: McpServer) {
                 content: [
                     {
                         type: "text",
-                        text: "Comment added successfully!",
+                        text: "Issue added successfully!",
                     },
                 ],
             };
