@@ -23,6 +23,8 @@ export function getProjectsResource(server: McpServer) {
                 name: val.name,
             }))
 
+            console.log('Fetched projects:', data)
+
             return {
                 contents: [{
                     uri: uri.href,
