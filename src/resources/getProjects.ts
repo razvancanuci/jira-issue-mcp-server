@@ -1,6 +1,7 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import { api } from "../infrastructure/api.js";
 import {StatusCodes} from "../constants/statusCodes.js";
+import {logger} from "../infrastructure/logger.js";
 
 export function getProjectsResource(server: McpServer) {
     server.resource(
@@ -15,6 +16,7 @@ export function getProjectsResource(server: McpServer) {
             const response = await api.get('/rest/api/3/project/search');
 
             if (response.status !== StatusCodes.OK) {
+                logger.error('Error fetching projects:', response.statusText, response.data);
                 throw new Error(`Error fetching projects: ${response.statusText}`);
             }
             const data = response.data.values.map((val: any) => ({
@@ -23,7 +25,7 @@ export function getProjectsResource(server: McpServer) {
                 name: val.name,
             }))
 
-            console.log('Fetched projects:', data)
+            logger.info('Fetched projects:', data);
 
             return {
                 contents: [{

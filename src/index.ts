@@ -7,7 +7,7 @@ import {registerResources} from "./resources/index.js";
 import {registerPrompts} from "./prompts/index.js";
 import apm from 'elastic-apm-node';
 
-configDotenv({debug: true});
+configDotenv();
 // Create an MCP server
 const server = new McpServer({
   name: "Jira tool MCP Server",
@@ -17,7 +17,7 @@ const server = new McpServer({
 registerTools(server);
 registerResources(server);
 registerPrompts(server);
-//TODO: Add winston for logging
+
 apm.start({
     captureBody: 'all',
     serviceName: 'jira-tool-mcp-server',
@@ -32,7 +32,6 @@ apm.start({
 
     instrument: true,
 });
-
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
