@@ -36,4 +36,4 @@ axiosRetry(api, {
     }
 });
 
-export {api};
+export { api };

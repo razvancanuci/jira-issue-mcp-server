@@ -1,5 +1,6 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
+import {logger} from "../infrastructure/logger.js";
 
 
 export function bugReportPrompt(server:McpServer) {
@@ -20,6 +21,8 @@ export function bugReportPrompt(server:McpServer) {
             prompt += `\nThe prompt should also include the steps to reproduce, which should also be in the user's input \n**Steps to Reproduce**: ${stepsToReproduce}.
             \nPlease provide a detailed description of the bug, including any relevant information that can help in diagnosing the issue.\n
             You can also detail the user's input if it is not well written.`;
+
+            logger.info('bugReportPrompt has been called', {expectedResult, actualResult, stepsToReproduce});
 
             return {
                     messages: [{

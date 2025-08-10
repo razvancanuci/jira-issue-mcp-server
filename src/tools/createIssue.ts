@@ -3,6 +3,7 @@ import {z} from "zod";
 import {api} from "../infrastructure/api.js";
 import {ADFDocumentSchema} from "../models/index.js";
 import {StatusCodes} from "../constants/statusCodes.js";
+import {logger} from "../infrastructure/logger.js";
 
 export function createIssueTool(server: McpServer) {
     server.tool(
@@ -16,43 +17,72 @@ export function createIssueTool(server: McpServer) {
             priority: z.enum(['Low', 'Medium', 'High']).optional().describe("The priority of the issue to be created. If not provided, it will default to 'Medium'."),
         },
         async ({summary, description, projectKey, type, priority}) => {
-            const response = await api.post(`rest/api/3/issue`, {
-                fields: {
-                    project: {
-                        key: projectKey,
-                    },
-                    summary,
-                    description,
-                    issuetype: {
-                        name: type || 'Task'
-                    },
-                    priority: {
-                        name: priority || 'Medium'
-                    },
-                }
-            });
-
-            if (response.status !== StatusCodes.CREATED) {
-                console.error({status: response.statusText, data: response.data});
+            try {
+                return await handleCreateIssueTool({summary, description, projectKey, type, priority});
+            }
+            catch(err) {
+                logger.error('Error creating issue:', err);
                 return {
                     isError: true,
                     content: [
                         {
                             type: "text",
-                            text: `Error creating issue: ${response.statusText}`,
+                            text: `Error creating issue: ${err instanceof Error ? err.message : 'Unknown error'}`,
                         },
                     ],
                 };
             }
-
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: "Issue added successfully!",
-                    },
-                ],
-            };
         }
     );
+}
+
+async function handleCreateIssueTool({summary, description, projectKey, type, priority} : {
+    summary: string,
+    description: {
+        type: "doc"
+        version: 1
+        content?: any[] | undefined
+    },
+    projectKey: string,
+    type?: 'Task' | 'Bug' | 'Epic' | 'Story',
+    priority?: 'Low' | 'Medium' | 'High'}) : Promise<any> {
+
+    const response = await api.post(`rest/api/3/issue`, {
+        fields: {
+            project: {
+                key: projectKey,
+            },
+            summary,
+            description,
+            issuetype: {
+                name: type || 'Task'
+            },
+            priority: {
+                name: priority || 'Medium'
+            },
+        }
+    });
+
+    if (response.status !== StatusCodes.CREATED) {
+        logger.error('Creating issue failed:', {status: response.statusText, data: response.data});
+        return {
+            isError: true,
+            content: [
+                {
+                    type: "text",
+                    text: `Error creating issue: ${response.statusText}`,
+                },
+            ],
+        };
+    }
+
+    logger.info('Issue created successfully:', {summary, description, projectKey, type, priority});
+    return {
+        content: [
+            {
+                type: "text",
+                text: "Issue added successfully!",
+            },
+        ],
+    };
 }
