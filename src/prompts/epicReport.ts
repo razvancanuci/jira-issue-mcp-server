@@ -3,7 +3,7 @@ import {logger} from "../infrastructure/logger.js";
 
 export function epicReportPrompt(server:McpServer) {
     server.registerPrompt(
-        "epicReportPrompt",
+        "epic_report_prompt",
         {
             title: `JIRA Epic Report Prompt`,
             description: 'In case of an EPIC Issue, please provide all the details that can help in creating an epic report.',

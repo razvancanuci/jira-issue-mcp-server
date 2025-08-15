@@ -7,7 +7,7 @@ import {logger} from "../infrastructure/logger.js";
 
 export function createIssueTool(server: McpServer) {
     server.tool(
-        'createIssue',
+        'create_issue',
         'Creates an issue to the users',
         {
             summary: z.string().describe("The title of the issue to be created."),

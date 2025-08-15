@@ -5,7 +5,7 @@ import {logger} from "../infrastructure/logger.js";
 
 export function bugReportPrompt(server:McpServer) {
     server.registerPrompt(
-        "bugReportPrompt",
+        "bug_report_prompt",
         {
             title: `JIRA Bug Report Prompt`,
             description: 'In case of a BUG Issue, please provide the expected result, actual result and steps to reproduce the issue',

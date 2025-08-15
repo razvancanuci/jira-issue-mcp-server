@@ -5,7 +5,7 @@ import {logger} from "../infrastructure/logger.js";
 
 export function getProjectsResource(server: McpServer) {
     server.resource(
-        'getProjects',
+        'get_projects',
         'jira://projects',
         {
             title: 'All projects',
