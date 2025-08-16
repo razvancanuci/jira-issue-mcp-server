@@ -37,7 +37,7 @@ logger.on('error', (error) => {
 });
 
 esTransport.on('error', (error) => {
-    console.error('Error in logger caught', error);
+    console.error('Error in transport caught', error);
 });
 
 export { logger };

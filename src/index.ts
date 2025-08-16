@@ -7,6 +7,7 @@ import {registerPrompts} from "./prompts/index.js";
 import apm from 'elastic-apm-node';
 import {logger} from "./infrastructure/logger.js";
 import {JiraServer} from "./server.js";
+import {app} from "./infrastructure/express.js";
 
 configDotenv();
 // Create an MCP server
@@ -19,25 +20,12 @@ registerTools(server);
 registerResources(server);
 registerPrompts(server);
 
-apm.start({
-    captureBody: 'all',
-    serviceName: 'jira-tool-mcp-server',
-    serverUrl: process.env.ELASTIC_URL,
-    apiKey: process.env.ELASTIC_APM_API_KEY,
-    transactionSampleRate: 1.0,
-    environment: process.env.ENVIRONMENT || 'development',
-    active: true,
-    verifyServerCert: false,
-    captureErrorLogStackTraces: 'always',
-    ignoreUrls: ['/health', '/favicon.ico'],
-
-    instrument: true,
-});
-
 const jiraServer = new JiraServer(server);
 
 logger.info('Starting MCP server...');
 
-await jiraServer.start();
+jiraServer.start().then(() => {
+    app.listen(3000)
+});
 
 
