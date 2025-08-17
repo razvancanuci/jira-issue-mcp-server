@@ -4,7 +4,6 @@ import {registerTools} from "./tools/index.js";
 import {configDotenv} from "dotenv";
 import {registerResources} from "./resources/index.js";
 import {registerPrompts} from "./prompts/index.js";
-import apm from 'elastic-apm-node';
 import {logger} from "./infrastructure/logger.js";
 import {JiraServer} from "./server.js";
 import {app} from "./infrastructure/express.js";
