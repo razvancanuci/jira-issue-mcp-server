@@ -3,6 +3,8 @@ import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
 import {StreamableHTTPServerTransport} from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import {app} from "./infrastructure/express.js";
 import {logger} from "./infrastructure/logger.js";
+import {oauthClient} from "./infrastructure/oauth2.js";
+import {ensureOAuth} from "./middlewares/ensureOauth.js";
 
 export class JiraServer {
 
@@ -25,7 +27,34 @@ export class JiraServer {
 
     private async handleRemoteServer() {
 
-        app.post('/mcp', async (req, res) => {
+        app.get('/auth', (_req, res) => {
+            const authorizationUri = oauthClient.authorizeURL({
+                redirect_uri: 'http://localhost:3000/oauth/callback',
+                scope: 'read:jira-user read:jira-work write:jira-work',
+                state: 'random_state_string'
+            });
+            res.redirect(authorizationUri);
+        });
+
+        app.get('/oauth/callback', async (req, res) => {
+            const { code } = req.query;
+            try {
+                const result = await oauthClient.getToken({
+                    code: code as string,
+                    redirect_uri: 'http://localhost:3000/oauth/callback'
+                });
+
+                res.json(result);
+            } catch (error) {
+                const err = error as Error;
+                logger.error('Access Token Error', err.message);
+                res.status(500).json('Authentication failed');
+            }
+        });
+
+
+
+        app.post('/mcp', ensureOAuth, async (req, res) => {
             const transport = new StreamableHTTPServerTransport({
                 sessionIdGenerator: undefined
             })
