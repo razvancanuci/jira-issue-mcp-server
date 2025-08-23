@@ -47,7 +47,7 @@ export class JiraServer {
                 res.json(result);
             } catch (error) {
                 const err = error as Error;
-                logger.error('Access Token Error', err.message);
+                logger.error(`Access Token Error, ${err.message}`);
                 res.status(500).json('Authentication failed');
             }
         });
