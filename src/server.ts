@@ -7,6 +7,15 @@ import {oauthClient} from "./infrastructure/oauth2.js";
 import {getAtlassianUserInfo} from "./infrastructure/atlassianUserInfo.js";
 import {getAtlassianAccessibleResources} from "./infrastructure/atlassianAccesibleResources.js";
 import {AccessToken} from "simple-oauth2";
+import {CacheData} from "./models/cacheData.js";
+import {redisClient} from "./infrastructure/redis.js";
+import jwt, {JwtPayload} from "jsonwebtoken";
+import { gzip } from "node:zlib";
+import {promisify} from "node:util";
+import {compress, decompress} from "./utils/compression.js";
+
+const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gzip);
 
 export class JiraServer {
 
@@ -38,7 +47,6 @@ export class JiraServer {
             res.redirect(authorizationUri);
         });
 
-        //TODO: Add redis to store user info, access token and other data
         app.get('/oauth/callback', async (req, res) => {
             const { code } = req.query;
             let result: AccessToken;
@@ -58,7 +66,17 @@ export class JiraServer {
                     getAtlassianAccessibleResources(result.token.access_token as string)
                 ]);
 
-                res.json(result);
+            const decodedToken = jwt.decode(result.token.access_token as string) as JwtPayload;
+
+            const cacheData: CacheData = {accessToken: result.token.access_token as string, userInfo: userInfo, resources: resources.resources};
+
+            const expiration = new Date((decodedToken.exp as number) * 1000).getTime() - Date.now();
+
+            const compressedData = await compress(JSON.stringify(cacheData));
+
+            await redisClient.setex(userInfo.email, expiration, compressedData);
+
+            res.json(result);
 
         });
 
