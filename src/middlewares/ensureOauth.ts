@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../infrastructure/logger.js';
 import jwt, {JwtPayload} from 'jsonwebtoken';
 
+//TODO: to be deleted after redis will be added to check
 export async function ensureOAuth(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
