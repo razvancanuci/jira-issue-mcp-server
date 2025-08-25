@@ -1,28 +1,25 @@
 import {logger} from "./logger.js";
+import {getApiInstance} from "./api.js";
 
 export async function getAtlassianUserInfo(accessToken: string) {
-    try {
-        const response = await fetch('https://api.atlassian.com/me', {
+
+        const api = getApiInstance('https://api.atlassian.com');
+
+        const response = await api.get('/me', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Accept': 'application/json'
             }
+        }).catch((error) => {
+            logger.error('Error fetching Atlassian user info:', error);
+            throw error;
         });
 
-        if (!response.ok) {
-            throw new Error(`Atlassian API error: ${response.status}`);
-        }
-
-        const userInfo = await response.json();
+        const userInfo =  response.data;
 
         return {
             accountId: userInfo.account_id,
             email: userInfo.email,
             displayName: userInfo.name,
         };
-
-    } catch (error) {
-        logger.error('Error fetching Atlassian user info:', error);
-        throw error;
-    }
 }
