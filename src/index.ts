@@ -2,7 +2,6 @@ import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import 'dotenv/config';
 import {registerTools} from "./tools/index.js";
 import {configDotenv} from "dotenv";
-import {registerResources} from "./resources/index.js";
 import {registerPrompts} from "./prompts/index.js";
 import {logger} from "./infrastructure/logger.js";
 import {JiraServer} from "./server.js";
@@ -16,7 +15,6 @@ const server = new McpServer({
 });
 
 registerTools(server);
-registerResources(server);
 registerPrompts(server);
 
 const jiraServer = new JiraServer(server);

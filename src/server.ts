@@ -2,7 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
 import {app} from "./infrastructure/express.js";
 import {logger} from "./infrastructure/logger.js";
-import {oauthClient} from "./infrastructure/oauth2.js";
+import {getAuthorizationUri, oauthClient} from "./infrastructure/oauth2.js";
 import {getAtlassianUserInfo} from "./infrastructure/atlassianUserInfo.js";
 import {getAtlassianAccessibleResources} from "./infrastructure/atlassianAccesibleResources.js";
 import {AccessToken} from "simple-oauth2";
@@ -22,11 +22,7 @@ export class JiraServer {
         });
 
         app.get('/auth', (_req, res) => {
-            const authorizationUri = oauthClient.authorizeURL({
-                redirect_uri: `${process.env.SERVER_DOMAIN}/oauth/callback`,
-                scope: 'read:jira-user read:jira-work write:jira-work read:me',
-                state: 'random_state_string'
-            });
+            const authorizationUri = getAuthorizationUri();
 
             logger.info('Authorization URL endpoint called');
             res.redirect(authorizationUri);
@@ -41,15 +37,21 @@ export class JiraServer {
                     redirect_uri: `${process.env.SERVER_DOMAIN}/oauth/callback`
                 });
             } catch (error) {
-                const err = error as Error;
-                logger.error(`Access Token Error, ${err.message}`);
-                return res.status(500).json('Authentication failed');
+                logger.error(`Access Token Error`, error);
+                return res.status(500).json('Something went wrong');
             }
 
-            const [userInfo, resources] = await Promise.all([
-                getAtlassianUserInfo(result.token.access_token as string),
-                getAtlassianAccessibleResources(result.token.access_token as string)
-            ]);
+            let userInfo: any;
+            let resources: any;
+            try {
+                [userInfo, resources] = await Promise.all([
+                    getAtlassianUserInfo(result.token.access_token as string),
+                    getAtlassianAccessibleResources(result.token.access_token as string)
+                ]);
+            } catch(error) {
+                logger.error('Error fetching user info or resources', error);
+                return res.status(500).json('Something went wrong');
+            }
 
             const decodedToken = jwt.decode(result.token.access_token as string) as JwtPayload;
 
@@ -59,8 +61,13 @@ export class JiraServer {
 
             const compressedData = await compress(JSON.stringify(cacheData));
 
-            await redisClient.setex(userInfo.email, expiration, compressedData);
-
+            try {
+                await redisClient.setex(userInfo.email, expiration, compressedData);
+            }
+            catch (error) {
+                logger.error('Error caching data in Redis', error);
+                return res.status(500).json('Something went wrong');
+            }
             logger.info(`User ${userInfo.displayName} authenticated successfully with email ${userInfo.email}`);
 
             res.json(result);

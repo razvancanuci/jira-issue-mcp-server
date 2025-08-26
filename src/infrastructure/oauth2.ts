@@ -15,4 +15,12 @@ const config = {
 
 const oauthClient = new AuthorizationCode(config);
 
+export function getAuthorizationUri() {
+    return oauthClient.authorizeURL({
+        redirect_uri: `${process.env.SERVER_DOMAIN}/oauth/callback`,
+        scope: 'read:jira-user read:jira-work write:jira-work read:me',
+        state: 'random_state_string'
+    });
+}
+
 export { oauthClient }
