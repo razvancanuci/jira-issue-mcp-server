@@ -70,7 +70,7 @@ export class JiraServer {
             }
             logger.info(`User ${userInfo.displayName} authenticated successfully with email ${userInfo.email}`);
 
-            res.json(result);
+            res.status(200).send('Authentication successfully!');
         });
 
         logger.info('Starting MCP server with STDIO...');
