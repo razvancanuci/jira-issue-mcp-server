@@ -1,24 +1,29 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
-import {api} from "../infrastructure/api.js";
-import {ADFDocumentSchema} from "../models/index.js";
+import {getApiInstance} from "../infrastructure/api.js";
+import {ADFDocumentSchema, CacheData} from "../models/index.js";
 import {StatusCodes} from "../constants/statusCodes.js";
 import {logger} from "../infrastructure/logger.js";
+import {redisClient} from "../infrastructure/redis.js";
+import {decompress} from "../utils/compression.js";
+import {getCacheData} from "../utils/cacheData.js";
 
 export function createIssueTool(server: McpServer) {
     server.tool(
         'create_issue',
         'Creates an issue to the users',
         {
+            userEmail: z.string().email().describe("The email of the user creating the issue."),
+            resourceId: z.string().describe("The ID of the resource being used to call to create the issue."),
             summary: z.string().describe("The title of the issue to be created."),
             description: ADFDocumentSchema.describe("The description of the issue to be created, formatted as an Atlassian Document Format (ADF)."),
             projectKey: z.string().describe("The ID or key of the project where the issue will be created."),
             type: z.enum(['Task', 'Bug', 'Epic', 'Story']).optional().describe("The type of the issue to be created. If not provided, it will default to 'Task'."),
             priority: z.enum(['Low', 'Medium', 'High']).optional().describe("The priority of the issue to be created. If not provided, it will default to 'Medium'."),
         },
-        async ({summary, description, projectKey, type, priority}) => {
+        async ({userEmail, resourceId, summary, description, projectKey, type, priority}) => {
             try {
-                return await handleCreateIssueTool({summary, description, projectKey, type, priority});
+                return await handleCreateIssueTool({userEmail, resourceId, summary, description, projectKey, type, priority});
             }
             catch(err) {
                 logger.error('Error creating issue:', err);
@@ -36,7 +41,9 @@ export function createIssueTool(server: McpServer) {
     );
 }
 
-async function handleCreateIssueTool({summary, description, projectKey, type, priority} : {
+async function handleCreateIssueTool({userEmail, resourceId, summary, description, projectKey, type, priority} : {
+    userEmail: string,
+    resourceId: string,
     summary: string,
     description: {
         type: "doc"
@@ -46,6 +53,22 @@ async function handleCreateIssueTool({summary, description, projectKey, type, pr
     projectKey: string,
     type?: 'Task' | 'Bug' | 'Epic' | 'Story',
     priority?: 'Low' | 'Medium' | 'High'}) : Promise<any> {
+
+    const cacheData = await getCacheData(userEmail);
+
+    if(!cacheData) {
+        return {
+            isError: true,
+            content: [
+                {
+                    type: "text",
+                    text: `Please try again after authorizing the app to access your Jira data.`,
+                },
+            ],
+        };
+    }
+
+    const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`);
 
     const response = await api.post(`rest/api/3/issue`, {
         fields: {
@@ -61,10 +84,15 @@ async function handleCreateIssueTool({summary, description, projectKey, type, pr
                 name: priority || 'Medium'
             },
         }
+    }, { headers: {
+            'Authorization': `Bearer ${cacheData.accessToken}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
     });
 
     if (response.status !== StatusCodes.CREATED) {
-        logger.error('Creating issue failed:', {status: response.statusText, data: response.data});
+        logger.error('Creating issue failed:', {userEmail, status: response.statusText, data: response.data});
         return {
             isError: true,
             content: [
