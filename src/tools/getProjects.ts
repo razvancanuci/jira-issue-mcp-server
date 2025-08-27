@@ -6,6 +6,7 @@ import {StatusCodes} from "../constants/statusCodes.js";
 import {logger} from "../infrastructure/logger.js";
 import {decompress} from "../utils/compression.js";
 import {CacheData} from "../models/index.js";
+import {getCacheData} from "../utils/cacheData.js";
 
 
 export function getProjectsTool(server: McpServer) {
@@ -18,14 +19,24 @@ export function getProjectsTool(server: McpServer) {
         },
         async ({userEmail, resourceId}) => {
 
-            const cacheStr = await redisClient.get(userEmail);
+            const cacheData = await getCacheData(userEmail);
 
-            const userDetails: CacheData = await decompress(cacheStr as string);
+            if(!cacheData) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `Please try again after authorizing the app to access your Jira data.`,
+                        },
+                    ],
+                };
+            }
 
             const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`);
 
             const response = await api.get('/rest/api/3/project/search', { headers: {
-                    'Authorization': `Bearer ${userDetails.accessToken}`,
+                    'Authorization': `Bearer ${cacheData.accessToken}`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }});

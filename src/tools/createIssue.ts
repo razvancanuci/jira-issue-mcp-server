@@ -6,6 +6,7 @@ import {StatusCodes} from "../constants/statusCodes.js";
 import {logger} from "../infrastructure/logger.js";
 import {redisClient} from "../infrastructure/redis.js";
 import {decompress} from "../utils/compression.js";
+import {getCacheData} from "../utils/cacheData.js";
 
 export function createIssueTool(server: McpServer) {
     server.tool(
@@ -53,9 +54,19 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
     type?: 'Task' | 'Bug' | 'Epic' | 'Story',
     priority?: 'Low' | 'Medium' | 'High'}) : Promise<any> {
 
-    const cacheStr = await redisClient.get(userEmail);
+    const cacheData = await getCacheData(userEmail);
 
-    const userDetails: CacheData = await decompress(cacheStr as string);
+    if(!cacheData) {
+        return {
+            isError: true,
+            content: [
+                {
+                    type: "text",
+                    text: `Please try again after authorizing the app to access your Jira data.`,
+                },
+            ],
+        };
+    }
 
     const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`);
 
@@ -74,7 +85,7 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
             },
         }
     }, { headers: {
-            'Authorization': `Bearer ${userDetails.accessToken}`,
+            'Authorization': `Bearer ${cacheData.accessToken}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }

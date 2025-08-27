@@ -1,8 +1,6 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
-import {redisClient} from "../infrastructure/redis.js";
-import {CacheData} from "../models/index.js";
-import {decompress} from "../utils/compression.js";
+import {getCacheData} from "../utils/cacheData.js";
 
 
 export function getAccessibleResourcesTool(server: McpServer) {
@@ -12,15 +10,25 @@ export function getAccessibleResourcesTool(server: McpServer) {
             userEmail: z.string().email().describe("The email of the user accessing the resources.")
         },
         async ({ userEmail }) => {
-            const cacheStr = await redisClient.get(userEmail);
+            const cacheData = await getCacheData(userEmail);
 
-            const userDetails: CacheData = await decompress(cacheStr as string);
+            if(!cacheData) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `Please try again after authorizing the app to access your Jira data.`,
+                        },
+                    ],
+                };
+            }
 
             return {
                 content: [
                     {
                         type: "text",
-                        text: JSON.stringify(userDetails.resources),
+                        text: JSON.stringify(cacheData.resources),
                     },
                 ],
             }
