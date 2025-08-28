@@ -1,9 +1,6 @@
 import {ElasticsearchTransport, ElasticsearchTransportOptions} from "winston-elasticsearch";
 import winston from "winston";
 
-if(process.env.ENVIRONMENT !== 'local') {
-
-}
 const esTransportOpts: ElasticsearchTransportOptions = {
     level: 'info',
     clientOpts: {
