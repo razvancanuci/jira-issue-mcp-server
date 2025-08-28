@@ -1,10 +1,12 @@
 import {CacheData} from "../models/index.js";
 import {redisClient} from "../infrastructure/redis.js";
-import {decompress} from "./compression.js";
-import {getAuthorizationUri} from "../infrastructure/oauth2.js";
+import {compress, decompress} from "./compression.js";
+import {getAuthorizationUri, oauthClient} from "../infrastructure/oauth2.js";
 import open from 'open';
+import jwt, {JwtPayload} from "jsonwebtoken";
+import {logger} from "../infrastructure/logger.js";
 
-export async function getCacheData(userEmail: string): Promise<CacheData | null> {
+export async function getUpdatedCachedData(userEmail: string): Promise<CacheData | null> {
     const cacheStr = await redisClient.get(userEmail);
 
     if(!cacheStr) {
@@ -13,5 +15,36 @@ export async function getCacheData(userEmail: string): Promise<CacheData | null>
         return null;
     }
 
-    return await decompress(cacheStr);
+    const decompressed =  await decompress(cacheStr);
+    const data =  JSON.parse(decompressed) as CacheData;
+
+    const decodedToken = jwt.decode(data.accessToken) as JwtPayload;
+
+    let accessToken = oauthClient.createToken({
+        access_token: data.accessToken,
+        expires_at: decodedToken.expires_at || new Date((decodedToken.exp as number) * 1000).toISOString(),
+        token_type: 'Bearer',
+        scope: decodedToken.scope || 'read:jira-user read:jira-work write:jira-work read:me'
+    });
+
+    if(accessToken.expired()) {
+        try {
+            accessToken = await accessToken.refresh();
+            data.accessToken = accessToken.token.access_token as string;
+
+            const expiration = new Date((decodedToken.exp as number) * 1000).getTime() - Date.now();
+            const compressedData = await compress(JSON.stringify(data));
+            await redisClient.setex(userEmail, expiration, compressedData);
+
+            return data;
+        } catch (error) {
+            logger.error('Error refreshing access token:', error);
+            const authUrl = getAuthorizationUri();
+            await open(authUrl);
+            return null;
+        }
+    }
+
+    return data;
+
 }

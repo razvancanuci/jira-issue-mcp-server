@@ -1,6 +1,6 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
-import {getCacheData} from "../utils/cacheData.js";
+import {getUpdatedCachedData} from "../utils/cacheData.js";
 
 
 export function getAccessibleResourcesTool(server: McpServer) {
@@ -10,7 +10,7 @@ export function getAccessibleResourcesTool(server: McpServer) {
             userEmail: z.string().email().describe("The email of the user accessing the resources.")
         },
         async ({ userEmail }) => {
-            const cacheData = await getCacheData(userEmail);
+            const cacheData = await getUpdatedCachedData(userEmail);
 
             if(!cacheData) {
                 return {
