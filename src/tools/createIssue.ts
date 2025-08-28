@@ -1,12 +1,10 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {getApiInstance} from "../infrastructure/api.js";
-import {ADFDocumentSchema, CacheData} from "../models/index.js";
+import {ADFDocumentSchema} from "../models/index.js";
 import {StatusCodes} from "../constants/statusCodes.js";
 import {logger} from "../infrastructure/logger.js";
-import {redisClient} from "../infrastructure/redis.js";
-import {decompress} from "../utils/compression.js";
-import {getCacheData} from "../utils/cacheData.js";
+import {getUpdatedCachedData} from "../utils/cacheData.js";
 
 export function createIssueTool(server: McpServer) {
     server.tool(
@@ -54,7 +52,7 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
     type?: 'Task' | 'Bug' | 'Epic' | 'Story',
     priority?: 'Low' | 'Medium' | 'High'}) : Promise<any> {
 
-    const cacheData = await getCacheData(userEmail);
+    const cacheData = await getUpdatedCachedData(userEmail);
 
     if(!cacheData) {
         return {

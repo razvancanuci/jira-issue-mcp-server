@@ -1,13 +1,9 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
-import {redisClient} from "../infrastructure/redis.js";
 import {getApiInstance} from "../infrastructure/api.js";
 import {StatusCodes} from "../constants/statusCodes.js";
 import {logger} from "../infrastructure/logger.js";
-import {decompress} from "../utils/compression.js";
-import {CacheData} from "../models/index.js";
-import {getCacheData} from "../utils/cacheData.js";
-
+import {getUpdatedCachedData} from "../utils/cacheData.js";
 
 export function getProjectsTool(server: McpServer) {
     server.tool(
@@ -19,7 +15,7 @@ export function getProjectsTool(server: McpServer) {
         },
         async ({userEmail, resourceId}) => {
 
-            const cacheData = await getCacheData(userEmail);
+            const cacheData = await getUpdatedCachedData(userEmail);
 
             if(!cacheData) {
                 return {

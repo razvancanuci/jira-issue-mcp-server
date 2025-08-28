@@ -1,6 +1,6 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
-import {app} from "./infrastructure/express.js";
+import {app, SERVER_DNS} from "./infrastructure/express.js";
 import {logger} from "./infrastructure/logger.js";
 import {getAuthorizationUri, oauthClient} from "./infrastructure/oauth2.js";
 import {getAtlassianUserInfo} from "./infrastructure/atlassianUserInfo.js";
@@ -34,7 +34,7 @@ export class JiraServer {
             try {
                 result = await oauthClient.getToken({
                     code: code as string,
-                    redirect_uri: `${process.env.SERVER_DOMAIN}/oauth/callback`
+                    redirect_uri: `${SERVER_DNS}/oauth/callback`
                 });
             } catch (error) {
                 logger.error(`Access Token Error`, error);
@@ -70,7 +70,7 @@ export class JiraServer {
             }
             logger.info(`User ${userInfo.displayName} authenticated successfully with email ${userInfo.email}`);
 
-            res.status(200).send('Authentication successfully!');
+            res.status(200).send('Authentication successful!');
         });
 
         logger.info('Starting MCP server with STDIO...');
