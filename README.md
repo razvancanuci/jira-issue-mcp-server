@@ -1,7 +1,17 @@
 ## JIRA ISSUE MCP SERVER
 This is a sample MCP server implementation for Jira issues. It uses OAuth 2.0 (3LO) to authenticate with Jira and create issues.
 
-## USAGE DETAILS
+## INSTRUCTIONS
+
+1. Create an Atlassian developer account and set up an OAuth 2.0 (3LO) app to get a client ID and secret: https://developer.atlassian.com/apps/
+
+2. Set up a Redis instance for caching the tokens and other data (should run on port 6379, redis default port).
+
+3. Clone this repository and install dependencies with `npm install`.
+
+4. Build the project with `npm run build`.
+
+5. Configure the MCP server in your MCP client (e.g., Jira Service Management) with the JSON configuration. This is an example configuration for Cursor:
 
 ```json
 {
