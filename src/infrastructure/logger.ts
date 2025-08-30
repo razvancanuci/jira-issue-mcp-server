@@ -9,7 +9,7 @@ const esTransportOpts: ElasticsearchTransportOptions = {
             apiKey: process.env.ELASTIC_API_KEY as string
         },
     },
-    indexPrefix: 'jira-tool-mcp-server-logs',
+    indexPrefix: 'jira-issue-mcp-server-logs',
     ensureIndexTemplate: true
 };
 
