@@ -1,7 +1,7 @@
 {
-  "name": "jira-tool-mcp-server",
+  "name": "jira-issue-mcp-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Model Context Protocol server for creating Jira issues",
   "type": "module",
   "main": "index.ts",
   "bin": {
@@ -14,9 +14,16 @@
     "inspector": "npx @modelcontextprotocol/inspector dist/index.js",
     "start": "node dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "mcp",
+    "jira",
+    "atlassian",
+    "model-context-protocol",
+    "api",
+    "create-issue"
+  ],
+  "author": "Razvan Canuci <razvan.canuci@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
     "axios": "^1.11.0",
