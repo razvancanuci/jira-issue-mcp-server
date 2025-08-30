@@ -1,4 +1,4 @@
-**JIRA TOOL MCP SERVER**
+## JIRA ISSUE MCP SERVER
 
 
 ## Legal
