@@ -2,12 +2,15 @@ import axios, {AxiosInstance} from 'axios';
 import axiosRetry from 'axios-retry';
 import {StatusCodes} from "../constants/statusCodes.js";
 
-export function getApiInstance(baseUrl:  string): AxiosInstance {
+export function getApiInstance(baseUrl:  string, accessToken: string): AxiosInstance {
     const api = axios.create({
         baseURL: baseUrl,
         timeout: 5000,
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+
         },
         validateStatus: (status) => status < StatusCodes.INTERNAL_SERVER_ERROR
     });

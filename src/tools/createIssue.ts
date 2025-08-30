@@ -66,7 +66,7 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
         };
     }
 
-    const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`);
+    const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`, cacheData.accessToken);
 
     const response = await api.post(`rest/api/3/issue`, {
         fields: {
@@ -81,11 +81,6 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
             priority: {
                 name: priority || 'Medium'
             },
-        }
-    }, { headers: {
-            'Authorization': `Bearer ${cacheData.accessToken}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
         }
     });
 

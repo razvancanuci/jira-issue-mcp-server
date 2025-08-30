@@ -3,14 +3,9 @@ import {getApiInstance} from "./api.js";
 
 export async function getAtlassianUserInfo(accessToken: string) {
 
-        const api = getApiInstance('https://api.atlassian.com');
+        const api = getApiInstance('https://api.atlassian.com', accessToken);
 
-        const response = await api.get('/me', {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Accept': 'application/json'
-            }
-        }).catch((error) => {
+        const response = await api.get('/me').catch((error) => {
             logger.error('Error fetching Atlassian user info:', error);
             throw error;
         });

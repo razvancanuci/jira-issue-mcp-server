@@ -29,13 +29,9 @@ export function getProjectsTool(server: McpServer) {
                 };
             }
 
-            const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`);
+            const api = getApiInstance(`https://api.atlassian.com/ex/jira/${resourceId}`, cacheData.accessToken);
 
-            const response = await api.get('/rest/api/3/project/search', { headers: {
-                    'Authorization': `Bearer ${cacheData.accessToken}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }});
+            const response = await api.get('/rest/api/3/project/search');
 
             if (response.status !== StatusCodes.OK) {
                 logger.error('Error fetching projects:', response.statusText, response.data, userEmail);
