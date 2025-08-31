@@ -1,0 +1,46 @@
+startCommand:
+  type: "stdio"
+  commandFunction: |
+    (config) => ({
+      command: 'npm',
+      args: ['start'],
+      env: {
+        ATLASSIAN_CLIENT_ID: config.atlassianClientId,
+        ATLASSIAN_CLIENT_SECRET: config.atlassianClientSecret,
+        REDIS_HOST: config.redisHost,
+        ELASTIC_API_KEY: config.elasticApiKey,
+        ELASTIC_URL: config.elasticUrl,
+        SERVER_DOMAIN: config.serverDomain
+      }
+    })
+  configSchema:
+    type: "object"
+    properties:
+      atlassianClientId:
+        type: "string"
+        description: "Client ID for Atlassian OAuth connection"
+      atlassianClientSecret:
+        type: "string"
+        description: "Client Secret for Atlassian OAuth connection"
+      redisHost:
+        type: "string"
+        description: "Redis host URL (default is localhost). PORT is 6379 by default"
+        default: "localhost"
+      elasticUrl:
+        type: "string"
+        description: "URL for Elastic logging (optional). The default value is http://localhost:9200"
+        default: "http://localhost:9200"
+      elasticApiKey:
+        type: "string"
+        description: "API KEY for logging to Elastic"
+      serverDomain:
+        type: "string"
+        default: "http://localhost:3000"
+    required: ["atlassianClientId", "atlassianClientSecret"]
+  exampleConfig:
+    atlassianClientId: "your-oauth-client-id"
+    atlassianClientSecret: "your-oauth-client-secret"
+    redisUrl: "localhost"
+    elasticApiKey: "your-elastic-api-key"
+    elasticUrl: "your-elastic-url"
+    serverDomain: "http://localhost:3000"
