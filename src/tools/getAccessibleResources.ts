@@ -18,7 +18,7 @@ export function getAccessibleResourcesTool(server: McpServer) {
                     content: [
                         {
                             type: "text",
-                            text: `Please try again after authorizing the app to access your Jira data.`,
+                            text: `Please try again after user confirmed that he authorized the app to access the Jira data.`,
                         },
                     ],
                 };

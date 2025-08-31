@@ -1,6 +1,6 @@
 import axios, {AxiosInstance} from 'axios';
 import axiosRetry from 'axios-retry';
-import {StatusCodes} from "../constants/statusCodes.js";
+import {Constants} from "../constants/constants.js";
 
 export function getApiInstance(baseUrl:  string, accessToken: string): AxiosInstance {
     const api = axios.create({
@@ -12,7 +12,7 @@ export function getApiInstance(baseUrl:  string, accessToken: string): AxiosInst
             'Authorization': `Bearer ${accessToken}`
 
         },
-        validateStatus: (status) => status < StatusCodes.INTERNAL_SERVER_ERROR
+        validateStatus: (status) => status < Constants.INTERNAL_SERVER_ERROR
     });
 
     axiosRetry(api, {
@@ -20,7 +20,7 @@ export function getApiInstance(baseUrl:  string, accessToken: string): AxiosInst
         retryDelay: axiosRetry.exponentialDelay,
         retryCondition: (error) => {
             return axiosRetry.isNetworkOrIdempotentRequestError(error) ||
-                (error.response != null && error.response?.status >= StatusCodes.INTERNAL_SERVER_ERROR);
+                (error.response != null && error.response?.status >= Constants.INTERNAL_SERVER_ERROR);
         }
     });
 

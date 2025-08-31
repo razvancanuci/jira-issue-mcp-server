@@ -4,9 +4,9 @@ import winston from "winston";
 const esTransportOpts: ElasticsearchTransportOptions = {
     level: 'info',
     clientOpts: {
-        node: process.env.ELASTIC_URL,
+        node: process.env.ELASTIC_URL || 'http://localhost:9200',
         auth: {
-            apiKey: process.env.ELASTIC_API_KEY as string
+            apiKey: process.env.ELASTIC_API_KEY || ''
         },
     },
     indexPrefix: 'jira-issue-mcp-server-logs',

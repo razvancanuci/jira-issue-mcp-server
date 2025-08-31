@@ -1,7 +1,7 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {getApiInstance} from "../infrastructure/api.js";
-import {StatusCodes} from "../constants/statusCodes.js";
+import {Constants} from "../constants/constants.js";
 import {logger} from "../infrastructure/logger.js";
 import {getUpdatedCachedData} from "../utils/cacheData.js";
 
@@ -23,7 +23,7 @@ export function getProjectsTool(server: McpServer) {
                     content: [
                         {
                             type: "text",
-                            text: `Please try again after authorizing the app to access your Jira data.`,
+                            text: `Please try again after user confirmed that he authorized the app to access the Jira data.`,
                         },
                     ],
                 };
@@ -33,7 +33,7 @@ export function getProjectsTool(server: McpServer) {
 
             const response = await api.get('/rest/api/3/project/search');
 
-            if (response.status !== StatusCodes.OK) {
+            if (response.status !== Constants.OK) {
                 logger.error('Error fetching projects:', response.statusText, response.data, userEmail);
                 return {
                     isError: true,

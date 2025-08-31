@@ -10,6 +10,7 @@ import {CacheData} from "./models/index.js";
 import {redisClient} from "./infrastructure/redis.js";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import {compress} from "./utils/compression.js";
+import {Constants} from "./constants/constants.js";
 
 export class JiraServer {
 
@@ -57,7 +58,7 @@ export class JiraServer {
 
             const cacheData: CacheData = {accessToken: result.token.access_token as string, userInfo: userInfo, resources: resources.resources};
 
-            const expiration = new Date((decodedToken.exp as number) * 1000).getTime() - Date.now();
+            const expiration = new Date((decodedToken.exp as number) * Constants.MILLISECOND_DIFFERENCE + Constants.DAY_IN_MS).getTime() - Date.now();
 
             const compressedData = await compress(JSON.stringify(cacheData));
 

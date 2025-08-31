@@ -1,5 +1,5 @@
 
-export class StatusCodes {
+export class Constants {
     static readonly OK = 200;
     static readonly CREATED = 201;
     static readonly ACCEPTED = 202;
@@ -10,4 +10,8 @@ export class StatusCodes {
     static readonly NOT_FOUND = 404;
     static readonly CONFLICT = 409;
     static readonly INTERNAL_SERVER_ERROR = 500;
+
+    static readonly MILLISECOND_DIFFERENCE = 1000;
+    static readonly DAY_IN_MS = 86400000; // 24 * 60 * 60 * 1000
 }
+

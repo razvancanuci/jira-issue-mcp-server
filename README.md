@@ -47,7 +47,22 @@ Environment variable descriptions
 Only ATLASSIAN_CLIENT_ID and ATLASSIAN_CLIENT_SECRET are strictly required to run the server. All other environment variables are optional and can be left unset to use local/default behavior.
 
 ## DEMO
+For the Demo I used Cursor as MCP client.
+After the config added, you should see in settings something similar to this:
+![Cursor Config](./assets/jira-mcp-server-config.png)
 
+If there is no OAuth connection, first you will be redirected to the Atlassian authorization page to authorize the app.
+![Atlassian Auth](./assets/atlassian-auth.png)
+
+After the authorization, you should go to the Cursor to tell him that now it's all done and Cursor will do the magic if you have only one resource accessible and only one project.
+![Cursor Chat Done](./assets/cursor-chat.png)
+
+After that, you can see the task created in Jira.
+![Task Created](./assets/task-created.png)
+
+
+If you have Elastic connected, you can see the logs in Kibana.
+![Kibana Logs](./assets/elastic-logs.png)
 ## LEGAL
 
 - This project is not affiliated with Atlassian Inc.

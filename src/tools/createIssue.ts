@@ -2,7 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {z} from "zod";
 import {getApiInstance} from "../infrastructure/api.js";
 import {ADFDocumentSchema} from "../models/index.js";
-import {StatusCodes} from "../constants/statusCodes.js";
+import {Constants} from "../constants/constants.js";
 import {logger} from "../infrastructure/logger.js";
 import {getUpdatedCachedData} from "../utils/cacheData.js";
 
@@ -60,7 +60,7 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
             content: [
                 {
                     type: "text",
-                    text: `Please try again after authorizing the app to access your Jira data.`,
+                    text: `Please try again after user confirmed that he authorized the app to access the Jira data.`,
                 },
             ],
         };
@@ -84,7 +84,7 @@ async function handleCreateIssueTool({userEmail, resourceId, summary, descriptio
         }
     });
 
-    if (response.status !== StatusCodes.CREATED) {
+    if (response.status !== Constants.CREATED) {
         logger.error('Creating issue failed:', {userEmail, status: response.statusText, data: response.data});
         return {
             isError: true,

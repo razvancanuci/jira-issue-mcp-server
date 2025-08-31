@@ -5,6 +5,7 @@ import {getAuthorizationUri, oauthClient} from "../infrastructure/oauth2.js";
 import open from 'open';
 import jwt, {JwtPayload} from "jsonwebtoken";
 import {logger} from "../infrastructure/logger.js";
+import {Constants} from "../constants/constants.js";
 
 export async function getUpdatedCachedData(userEmail: string): Promise<CacheData | null> {
     const cacheStr = await redisClient.get(userEmail);
@@ -22,7 +23,7 @@ export async function getUpdatedCachedData(userEmail: string): Promise<CacheData
 
     let accessToken = oauthClient.createToken({
         access_token: data.accessToken,
-        expires_at: decodedToken.expires_at || new Date((decodedToken.exp as number) * 1000).toISOString(),
+        expires_at: decodedToken.expires_at || new Date((decodedToken.exp as number) * Constants.MILLISECOND_DIFFERENCE).toISOString(),
         token_type: 'Bearer',
         scope: decodedToken.scope || 'read:jira-user read:jira-work write:jira-work read:me'
     });
@@ -32,7 +33,7 @@ export async function getUpdatedCachedData(userEmail: string): Promise<CacheData
             accessToken = await accessToken.refresh();
             data.accessToken = accessToken.token.access_token as string;
 
-            const expiration = new Date((decodedToken.exp as number) * 1000).getTime() - Date.now();
+            const expiration = new Date((decodedToken.exp as number) * Constants.MILLISECOND_DIFFERENCE + Constants.DAY_IN_MS).getTime() - Date.now();
             const compressedData = await compress(JSON.stringify(data));
             await redisClient.setex(userEmail, expiration, compressedData);
 
