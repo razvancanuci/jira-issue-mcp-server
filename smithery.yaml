@@ -41,7 +41,6 @@ startCommand:
         type: "boolean"
         description: "Skip OAuth for testing/demo mode"
         default: true
-    required: ["atlassianClientId", "atlassianClientSecret"]
   exampleConfig:
     atlassianClientId: "your-oauth-client-id"
     atlassianClientSecret: "your-oauth-client-secret"
