@@ -1,3 +1,4 @@
+runtime: "node"
 startCommand:
   type: "stdio"
   commandFunction: |
