@@ -69,6 +69,12 @@ After that, you can see the task created in Jira.
 If you have Elastic connected, you can see the logs in Kibana.
 
 ![Kibana Logs](./assets/elastic-logs.png)
+
+## DISCLAIMER
+
+Starting from September 7th 2025, Smithery.AI will discontinue the support for the projects which require `STDIO` transport. 
+While the repository will remain accessible for reference, it cannot be deployed because of its dependencies.
+
 ## LEGAL
 
 - This project is not affiliated with Atlassian Inc.
