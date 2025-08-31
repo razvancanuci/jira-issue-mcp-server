@@ -3,15 +3,16 @@ startCommand:
   type: "stdio"
   commandFunction: |
     (config) => ({
-      command: 'npm',
-      args: ['start'],
+      command: 'npx',
+      args: ['tsx', 'src/index.ts'],
       env: {
         ATLASSIAN_CLIENT_ID: config.atlassianClientId,
         ATLASSIAN_CLIENT_SECRET: config.atlassianClientSecret,
         REDIS_HOST: config.redisHost,
         ELASTIC_API_KEY: config.elasticApiKey,
         ELASTIC_URL: config.elasticUrl,
-        SERVER_DOMAIN: config.serverDomain
+        SERVER_DOMAIN: config.serverDomain,
+        BYPASS_AUTH: config.bypassAuth ? 'true' : 'false'
       }
     })
   configSchema:
@@ -20,9 +21,11 @@ startCommand:
       atlassianClientId:
         type: "string"
         description: "Client ID for Atlassian OAuth connection"
+        default: "client-id"
       atlassianClientSecret:
         type: "string"
         description: "Client Secret for Atlassian OAuth connection"
+        default: "client-secret"
       redisHost:
         type: "string"
         description: "Redis host URL (default is localhost). PORT is 6379 by default"
@@ -34,6 +37,7 @@ startCommand:
       elasticApiKey:
         type: "string"
         description: "API KEY for logging to Elastic"
+        default: "api-key"
       serverDomain:
         type: "string"
         default: "http://localhost:3000"

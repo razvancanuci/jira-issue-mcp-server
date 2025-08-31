@@ -4,6 +4,7 @@
   "description": "Model Context Protocol server for creating Jira issues",
   "type": "module",
   "main": "index.ts",
+  "module": "src/index.ts",
   "bin": {
     "jira-tool-mcp-server": "./dist/index.js"
   },
