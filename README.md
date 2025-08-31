@@ -1,4 +1,7 @@
 ## JIRA ISSUE MCP SERVER
+
+[![smithery badge](https://smithery.ai/badge/@razvancanuci/jira-issue-mcp-server)](https://smithery.ai/server/@razvancanuci/jira-issue-mcp-server)
+
 This is a sample MCP server implementation for Jira issues. It uses OAuth 2.0 (3LO) to authenticate with Jira and create issues.
 
 ## INSTRUCTIONS
