@@ -36,6 +36,10 @@ startCommand:
       serverDomain:
         type: "string"
         default: "http://localhost:3000"
+      bypassAuth:
+        type: "boolean"
+        description: "Skip OAuth for testing/demo mode"
+        default: true
     required: ["atlassianClientId", "atlassianClientSecret"]
   exampleConfig:
     atlassianClientId: "your-oauth-client-id"
